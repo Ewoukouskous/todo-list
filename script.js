@@ -60,7 +60,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         todos.forEach(todo => {
             const taskEl = document.createElement('div');
-            taskEl.className = 'task-item flex items-center gap-4 p-4 border border-term-primary/20 rounded-lg bg-[#050D1A]/80 hover:border-term-primary/60 transition-all group duration-300 shadow-sm hover:shadow-glow';
+
+            // Allow animation only when the task is first created, not when rendered later (e.g. toggle completion)
+            let animationClass = todo.justAdded ? 'animate-slide-down ' : '';
+            if (todo.justAdded) {
+                delete todo.justAdded; // Only animate once
+            }
+
+            taskEl.className = `${animationClass}task-item flex items-center gap-4 p-4 border border-term-primary/20 rounded-lg bg-[#050D1A]/80 hover:border-term-primary/60 transition-all group duration-300 shadow-sm hover:shadow-glow`;
 
             // Checkbox logic
             const isCompleted = todo.completed;
@@ -69,8 +76,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 : 'w-6 h-6 rounded border border-term-primary/40 flex items-center justify-center text-transparent group-hover:border-term-secondary transition-colors cursor-pointer shrink-0';
 
             const textClass = isCompleted
-                ? 'flex-1 task-completed break-words font-medium'
-                : 'flex-1 text-term-text break-words font-medium transition-colors';
+                ? 'flex-1 task-completed break-words break-all min-w-0 font-medium'
+                : 'flex-1 text-term-text break-words break-all min-w-0 font-medium transition-colors';
 
             const checkMark = isCompleted ? '✓' : '';
 
@@ -79,6 +86,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${checkMark}
                 </button>
                 <span class="${textClass}">${escapeHtml(todo.text)}</span>
+                <button class="todo-edit text-term-muted hover:text-term-secondary transition-all opacity-0 group-hover:opacity-100 flex items-center justify-center shrink-0 font-bold tracking-widest px-2" aria-label="Edit task" title="Edit">
+                    [edit]
+                </button>
                 <button class="todo-delete text-term-muted hover:text-[#ff4d4d] transition-all opacity-0 group-hover:opacity-100 flex items-center justify-center shrink-0 font-bold tracking-widest px-2" aria-label="Delete task" title="Delete">
                     [del]
                 </button>
@@ -87,6 +97,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Event Listeners for buttons within task
             const toggleBtn = taskEl.querySelector('.todo-toggle');
             toggleBtn.addEventListener('click', () => toggleTodo(todo.id));
+
+            const editBtn = taskEl.querySelector('.todo-edit');
+            editBtn.addEventListener('click', () => startEditTodo(todo.id, taskEl));
 
             const deleteBtn = taskEl.querySelector('.todo-delete');
             deleteBtn.addEventListener('click', () => deleteTodo(todo.id));
@@ -112,7 +125,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const newTodo = {
             id: Date.now().toString(),
             text: text.trim(),
-            completed: false
+            completed: false,
+            justAdded: true
         };
 
         todos.push(newTodo); // Add to end
@@ -134,6 +148,47 @@ document.addEventListener('DOMContentLoaded', () => {
         todos = todos.filter(todo => todo.id !== id);
         saveToLocalStorage();
         renderTodos();
+    };
+
+    // Start Editing Todo Interactive
+    const startEditTodo = (id, taskEl) => {
+        const todo = todos.find(t => t.id === id);
+        if (!todo) return;
+
+        const spanEl = taskEl.querySelector('span');
+        if (!spanEl) return;
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = todo.text;
+        // Styling matches terminal aesthetic
+        input.className = 'flex-1 bg-[#050D1A]/90 border border-term-secondary rounded px-3 py-1 min-w-0 text-term-text focus:outline-none focus:shadow-glow-focus text-sm sm:text-base font-medium font-mono';
+
+        taskEl.replaceChild(input, spanEl);
+        input.focus();
+
+        // Hide action buttons during edit
+        const editBtn = taskEl.querySelector('.todo-edit');
+        const deleteBtn = taskEl.querySelector('.todo-delete');
+        if (editBtn) editBtn.classList.add('hidden');
+        if (deleteBtn) deleteBtn.classList.add('hidden');
+
+        let isSaved = false;
+        const saveEdit = () => {
+            if (isSaved) return;
+            isSaved = true;
+            const newText = input.value.trim();
+            if (newText) {
+                todo.text = newText;
+                saveToLocalStorage();
+            }
+            renderTodos(); // rerender hides input and restores buttons
+        };
+
+        input.addEventListener('blur', saveEdit); // Save when clicking out
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') saveEdit(); // Save on Enter key
+        });
     };
 
     // Export to JSON
