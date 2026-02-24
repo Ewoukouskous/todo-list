@@ -46,11 +46,25 @@
         <header
             class="border border-term-primary/40 rounded-lg p-6 bg-term-surface backdrop-blur-md shadow-glow relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-term-primary to-term-secondary"></div>
-            <h1
-                class="text-3xl md:text-5xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-term-secondary to-term-text">
-                ~/tasks $
-            </h1>
-            <p class="text-term-muted text-sm md:text-base">Gérez vos objectifs avec efficacité. [Status: Online]</p>
+            <div class="flex items-end justify-between border-b pb-4 border-term-primary/20 mb-4 gap-4 flex-wrap">
+                <div>
+                    <h1
+                        class="text-3xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-term-secondary to-term-text">
+                        ~/tasks $
+                    </h1>
+                    <p class="text-term-muted text-sm md:text-base mt-2">Gérez vos objectifs avec efficacité. [Status:
+                        Online]</p>
+                </div>
+
+                <div class="flex flex-col gap-1 w-full sm:w-auto">
+                    <label for="list-name-input" class="text-xs text-term-secondary font-bold">set_list_name
+                        --title</label>
+                    <input type="text" id="list-name-input" placeholder="cyber_state"
+                        class="bg-[#050D1A]/80 border border-term-primary/40 rounded px-3 py-1 text-term-text placeholder-term-muted/50 focus:outline-none focus:border-term-secondary focus:shadow-glow-focus transition-all w-full sm:w-48 text-sm"
+                        autocomplete="off">
+                </div>
+            </div>
+
         </header>
 
         <!-- Main Content -->

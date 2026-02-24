@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // State
     let todos = [];
+    let listName = 'cyber_state';
 
     // DOM Elements
     const todoForm = document.getElementById('todo-form');
@@ -9,16 +10,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const emptyState = document.getElementById('empty-state');
     const btnSave = document.getElementById('btn-save');
     const fileUpload = document.getElementById('file-upload');
+    const listNameInput = document.getElementById('list-name-input');
 
     // Load initial state from localStorage if exists
     const loadInitialState = () => {
         const saved = localStorage.getItem('terminall-todos');
         if (saved) {
             try {
-                todos = JSON.parse(saved);
+                const parsed = JSON.parse(saved);
+                // Handle new object format { listName, todos } or old array format
+                if (Array.isArray(parsed)) {
+                    todos = parsed;
+                } else if (parsed && typeof parsed === 'object') {
+                    todos = parsed.todos || [];
+                    listName = parsed.listName || 'cyber_state';
+                }
+
+                listNameInput.value = listName === 'cyber_state' ? '' : listName;
                 renderTodos();
             } catch (e) {
-                console.error('Failed to parse localStorage todos', e);
+                console.error('Failed to parse localStorage', e);
             }
         } else {
             renderTodos();
@@ -27,13 +38,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Save to localStorage
     const saveToLocalStorage = () => {
-        localStorage.setItem('terminall-todos', JSON.stringify(todos));
+        const stateToSave = {
+            listName: listName,
+            todos: todos
+        };
+        localStorage.setItem('terminall-todos', JSON.stringify(stateToSave));
     };
 
     // Render Todos
     const renderTodos = () => {
         todoList.innerHTML = '';
-        
+
         if (todos.length === 0) {
             emptyState.classList.remove('hidden');
             emptyState.classList.add('flex');
@@ -46,14 +61,14 @@ document.addEventListener('DOMContentLoaded', () => {
         todos.forEach(todo => {
             const taskEl = document.createElement('div');
             taskEl.className = 'task-item flex items-center gap-4 p-4 border border-term-primary/20 rounded-lg bg-[#050D1A]/80 hover:border-term-primary/60 transition-all group duration-300 shadow-sm hover:shadow-glow';
-            
+
             // Checkbox logic
             const isCompleted = todo.completed;
-            const checkboxClass = isCompleted 
+            const checkboxClass = isCompleted
                 ? 'w-6 h-6 rounded border border-term-secondary bg-term-secondary/20 flex items-center justify-center text-term-secondary transition-colors cursor-pointer shrink-0'
                 : 'w-6 h-6 rounded border border-term-primary/40 flex items-center justify-center text-transparent group-hover:border-term-secondary transition-colors cursor-pointer shrink-0';
-            
-            const textClass = isCompleted 
+
+            const textClass = isCompleted
                 ? 'flex-1 task-completed break-words font-medium'
                 : 'flex-1 text-term-text break-words font-medium transition-colors';
 
@@ -83,31 +98,31 @@ document.addEventListener('DOMContentLoaded', () => {
     // Utility to prevent XSS
     const escapeHtml = (unsafe) => {
         return unsafe
-             .replace(/&/g, "&amp;")
-             .replace(/</g, "&lt;")
-             .replace(/>/g, "&gt;")
-             .replace(/"/g, "&quot;")
-             .replace(/'/g, "&#039;");
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
     };
 
     // Add Todo
     const addTodo = (text) => {
         if (!text.trim()) return;
-        
+
         const newTodo = {
             id: Date.now().toString(),
             text: text.trim(),
             completed: false
         };
-        
-        todos.unshift(newTodo); // Add to beginning
+
+        todos.push(newTodo); // Add to end
         saveToLocalStorage();
         renderTodos();
     };
 
     // Toggle Todo
     const toggleTodo = (id) => {
-        todos = todos.map(todo => 
+        todos = todos.map(todo =>
             todo.id === id ? { ...todo, completed: !todo.completed } : todo
         );
         saveToLocalStorage();
@@ -128,10 +143,16 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const dataStr = JSON.stringify(todos, null, 2);
-        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-        
-        const exportFileDefaultName = `cyber_state_${new Date().toISOString().split('T')[0]}.json`;
+        const stateToExport = {
+            listName: listName,
+            todos: todos
+        };
+
+        const dataStr = JSON.stringify(stateToExport, null, 2);
+        const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+
+        const safeFilename = listName.trim().replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'cyber_state';
+        const exportFileDefaultName = `${safeFilename}.json`;
 
         let linkElement = document.createElement('a');
         linkElement.setAttribute('href', dataUri);
@@ -147,12 +168,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const reader = new FileReader();
         reader.onload = (e) => {
             try {
-                const importedTodos = JSON.parse(e.target.result);
+                const parsedData = JSON.parse(e.target.result);
+                let importedTodos = [];
+                let importedName = 'cyber_state';
+
+                // Detect format
+                if (Array.isArray(parsedData)) {
+                    // Old format
+                    importedTodos = parsedData;
+                } else if (parsedData && typeof parsedData === 'object') {
+                    // New format
+                    importedTodos = parsedData.todos || [];
+                    importedName = parsedData.listName || 'cyber_state';
+                }
+
                 // Basic validation
                 if (Array.isArray(importedTodos) && importedTodos.every(t => t.id && typeof t.text === 'string' && typeof t.completed === 'boolean')) {
                     todos = importedTodos;
+                    listName = importedName;
+                    listNameInput.value = listName === 'cyber_state' ? '' : listName;
+
                     saveToLocalStorage();
                     renderTodos();
+
                     // Reset file input so the same file can be selected again
                     event.target.value = '';
                 } else {
@@ -172,6 +210,11 @@ document.addEventListener('DOMContentLoaded', () => {
         addTodo(todoInput.value);
         todoInput.value = '';
         todoInput.focus();
+    });
+
+    listNameInput.addEventListener('input', (e) => {
+        listName = e.target.value.trim() || 'cyber_state';
+        saveToLocalStorage();
     });
 
     btnSave.addEventListener('click', exportJSON);
