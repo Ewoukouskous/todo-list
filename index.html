@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr" class="bg-[#0A0E14] text-[#E2CFEA] font-mono min-h-screen">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>~/$ todo-list</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'term-bg': '#0A0E14',
+                        'term-surface': 'rgba(5, 13, 26, 0.6)',
+                        'term-primary': '#6247AA',
+                        'term-secondary': '#A06CD5',
+                        'term-text': '#E2CFEA',
+                        'term-muted': 'rgba(226, 207, 234, 0.6)',
+                    },
+                    fontFamily: {
+                        mono: ['"Fira Code"', '"Courier New"', 'monospace'],
+                    },
+                    boxShadow: {
+                        'glow': '0 0 10px rgba(98, 71, 170, 0.5)',
+                        'glow-hover': '0 0 15px rgba(160, 108, 213, 0.6)',
+                        'glow-focus': '0 0 0 2px rgba(160, 108, 213, 0.2), 0 0 15px rgba(160, 108, 213, 0.5)'
+                    },
+                    backgroundImage: {
+                        'term-gradient': 'linear-gradient(135deg, #0A0E14 0%, #050D1A 50%, #102B3F 100%)'
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body
+    class="bg-term-gradient min-h-screen p-4 md:p-8 flex justify-center text-term-text antialiased selection:bg-term-primary selection:text-white">
+
+    <div class="max-w-3xl w-full flex flex-col gap-6">
+
+        <!-- Header -->
+        <header
+            class="border border-term-primary/40 rounded-lg p-6 bg-term-surface backdrop-blur-md shadow-glow relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-term-primary to-term-secondary"></div>
+            <h1
+                class="text-3xl md:text-5xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-term-secondary to-term-text">
+                ~/tasks $
+            </h1>
+            <p class="text-term-muted text-sm md:text-base">Gérez vos objectifs avec efficacité. [Status: Online]</p>
+        </header>
+
+        <!-- Main Content -->
+        <main
+            class="border border-term-primary/40 rounded-lg p-6 bg-term-surface backdrop-blur-md flex-1 flex flex-col gap-6 relative">
+
+            <!-- Input Area -->
+            <form id="todo-form" class="flex flex-col sm:flex-row gap-3">
+                <div class="relative flex-1 group">
+                    <span
+                        class="absolute left-3 top-1/2 -translate-y-1/2 text-term-primary font-bold group-focus-within:text-term-secondary transition-colors">➜</span>
+                    <input type="text" id="todo-input" placeholder="add_task --name=\" ...\""
+                        class="w-full bg-[#050D1A]/80 border border-term-primary/40 rounded-lg py-3 pl-10 pr-4 text-term-text placeholder-term-muted/50 focus:outline-none focus:border-term-secondary focus:shadow-glow-focus transition-all duration-300"
+                        autocomplete="off">
+                </div>
+                <button type="submit"
+                    class="btn-glow border border-term-primary rounded-lg px-6 py-3 font-bold hover:bg-term-primary/20 hover:border-term-secondary hover:shadow-glow-hover hover:text-white transition-all duration-300 whitespace-nowrap flex items-center justify-center gap-2">
+                    <span>[+]</span> Ajouter
+                </button>
+            </form>
+
+            <div class="h-px w-full bg-term-primary/20"></div>
+
+            <!-- Task List -->
+            <div class="flex-1 flex flex-col gap-3" id="todo-list">
+                <!-- Tasks will be injected here by JS -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state"
+                class="hidden flex-col items-center justify-center py-12 text-term-muted text-center opacity-50">
+                <span class="text-4xl mb-2 font-light">_{ }_</span>
+                <p>Aucune tâche en cours.</p>
+            </div>
+
+        </main>
+
+        <!-- Footer Actions (Save/Load) -->
+        <footer
+            class="flex flex-wrap gap-4 justify-between border border-term-primary/40 rounded-lg p-4 bg-term-surface backdrop-blur-md">
+            <div class="flex gap-4">
+                <button id="btn-save"
+                    class="text-sm px-4 py-2 border border-term-primary/40 rounded hover:bg-term-primary/20 hover:border-term-secondary hover:shadow-glow-hover transition-all flex items-center gap-2">
+                    <span class="text-term-secondary">↓</span> export.json
+                </button>
+                <label for="file-upload"
+                    class="cursor-pointer text-sm px-4 py-2 border border-term-primary/40 rounded hover:bg-term-primary/20 hover:border-term-secondary hover:shadow-glow-hover transition-all flex items-center gap-2">
+                    <span class="text-term-secondary">↑</span> import.json
+                </label>
+                <input id="file-upload" type="file" accept=".json" class="hidden">
+            </div>
+            <div class="text-term-muted/50 text-xs flex items-center">
+                v1.0.0 // sys_ready=true
+            </div>
+        </footer>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
