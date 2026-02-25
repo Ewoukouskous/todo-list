@@ -105,7 +105,7 @@
         <!-- Footer Actions (Save/Load) -->
         <footer
             class="flex flex-wrap gap-4 justify-between border border-term-primary/40 rounded-lg p-4 bg-term-surface backdrop-blur-md">
-            <div class="flex gap-4">
+            <div class="flex flex-wrap gap-4">
                 <button id="btn-save"
                     class="text-sm px-4 py-2 border border-term-primary/40 rounded hover:bg-term-primary/20 hover:border-term-secondary hover:shadow-glow-hover transition-all flex items-center gap-2">
                     <span class="text-term-secondary">↓</span> export.json
@@ -115,6 +115,10 @@
                     <span class="text-term-secondary">↑</span> import.json
                 </label>
                 <input id="file-upload" type="file" accept=".json" class="hidden">
+                <button id="btn-clear"
+                    class="text-sm px-4 py-2 border border-[#ff4d4d]/40 rounded hover:bg-[#ff4d4d]/20 hover:border-[#ff4d4d] hover:shadow-[0_0_15px_rgba(255,77,77,0.4)] transition-all flex items-center gap-2 text-[#ff4d4d]">
+                    <span class="font-bold">✗</span> rm -rf *
+                </button>
             </div>
             <div class="text-term-muted/50 text-xs flex items-center">
                 v1.0.0 // sys_ready=true

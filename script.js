@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const emptyState = document.getElementById('empty-state');
     const btnSave = document.getElementById('btn-save');
     const fileUpload = document.getElementById('file-upload');
+    const btnClear = document.getElementById('btn-clear');
     const listNameInput = document.getElementById('list-name-input');
 
     // Load initial state from localStorage if exists
@@ -215,6 +216,20 @@ document.addEventListener('DOMContentLoaded', () => {
         linkElement.click();
     };
 
+    // Clear All Todos
+    const clearAllTodos = () => {
+        if (todos.length === 0) {
+            alert('Err: System register is already empty.');
+            return;
+        }
+
+        if (confirm('Warning: Voulez-vous vraiment supprimer toutes les tâches ?\\nCette action est irréversible.')) {
+            todos = [];
+            saveToLocalStorage();
+            renderTodos();
+        }
+    };
+
     // Import from JSON
     const importJSON = (event) => {
         const file = event.target.files[0];
@@ -274,6 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnSave.addEventListener('click', exportJSON);
     fileUpload.addEventListener('change', importJSON);
+    btnClear.addEventListener('click', clearAllTodos);
 
     // Initial render
     loadInitialState();
