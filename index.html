@@ -38,9 +38,9 @@
 </head>
 
 <body
-    class="bg-term-gradient min-h-screen p-4 md:p-8 flex justify-center text-term-text antialiased selection:bg-term-primary selection:text-white">
+    class="bg-term-gradient h-screen overflow-hidden p-4 md:p-8 flex justify-center text-term-text antialiased selection:bg-term-primary selection:text-white">
 
-    <div class="max-w-3xl w-full flex flex-col gap-6">
+    <div class="max-w-3xl w-full h-full flex flex-col gap-6 min-h-0">
 
         <!-- Header -->
         <header
@@ -69,7 +69,7 @@
 
         <!-- Main Content -->
         <main
-            class="border border-term-primary/40 rounded-lg p-6 bg-term-surface backdrop-blur-md flex-1 flex flex-col gap-6 relative">
+            class="border border-term-primary/40 rounded-lg p-6 bg-term-surface backdrop-blur-md flex-1 flex flex-col gap-6 relative min-h-0">
 
             <!-- Input Area -->
             <form id="todo-form" class="flex flex-col sm:flex-row gap-3">
@@ -89,7 +89,7 @@
             <div class="h-px w-full bg-term-primary/20"></div>
 
             <!-- Task List -->
-            <div class="flex-1 flex flex-col gap-3" id="todo-list">
+            <div class="flex-1 flex flex-col gap-3 overflow-y-auto min-h-0 pr-2" id="todo-list">
                 <!-- Tasks will be injected here by JS -->
             </div>
 
